@@ -1,0 +1,1388 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8" />
+<title>Generative AI — Aman Kadam</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Newsreader:ital,opsz,wght@0,6..72,300;0,6..72,400;0,6..72,500;0,6..72,600;0,6..72,700;0,6..72,800;1,6..72,300;1,6..72,400;1,6..72,500;1,6..72,600&family=JetBrains+Mono:wght@400;500;600&family=Source+Serif+4:opsz,wght@8..60,300;8..60,400;8..60,600;8..60,700&family=Playfair+Display:ital,wght@0,400;0,700;0,900;1,400&family=Inter:wght@400;500;600&display=swap" rel="stylesheet">
+
+<style>
+:root{
+  --paper:#F2EDE2;
+  --ink:#1A1612;
+  --ink-2:#3A3128;
+  --muted:#7A6E5E;
+  --rule:#D8CFBE;
+  --accent:#B0492C;       /* burnt sienna */
+  --accent-soft:#E8D6CB;
+  --serif:"Newsreader", "Source Serif 4", Georgia, serif;
+  --display:"Newsreader", "Playfair Display", Georgia, serif;
+  --mono:"JetBrains Mono", ui-monospace, Menlo, monospace;
+  --sans:"Inter", ui-sans-serif, system-ui, sans-serif;
+
+  --type-display: 168px;
+  --type-title: 76px;
+  --type-subtitle: 44px;
+  --type-body: 32px;
+  --type-small: 26px;
+  --type-kicker: 26px;
+
+  --pad-top: 96px;
+  --pad-bottom: 88px;
+  --pad-x: 112px;
+  --gap-title: 52px;
+  --gap-item: 28px;
+}
+
+html, body { background: #1a1612; margin: 0; }
+body { font-family: var(--serif); color: var(--ink); }
+
+/* ─── Slide base ─────────────────────────────────────────────────── */
+deck-stage section{
+  background: var(--paper);
+  color: var(--ink);
+  position:relative;
+  overflow:hidden;
+}
+.slide{
+  position:absolute; inset:0;
+  padding: var(--pad-top) var(--pad-x) var(--pad-bottom);
+  display:flex; flex-direction:column;
+  box-sizing:border-box;
+}
+
+/* Page chrome (folio) */
+.folio{
+  position:absolute; left: var(--pad-x); right: var(--pad-x);
+  bottom: 40px;
+  display:flex; justify-content:space-between; align-items:baseline;
+  font-family: var(--mono);
+  font-size: 24px;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: var(--muted);
+}
+.folio .dot{ width:6px; height:6px; border-radius:50%; background:var(--accent); display:inline-block; margin-right:10px; vertical-align: middle; }
+
+/* Eyebrow */
+.eyebrow{
+  font-family: var(--mono);
+  font-size: var(--type-kicker);
+  letter-spacing: 0.16em;
+  text-transform: uppercase;
+  color: var(--accent);
+  display:flex; align-items:center; gap: 16px;
+}
+.eyebrow .num{ color: var(--muted); }
+.eyebrow .bar{ width:48px; height:1px; background:var(--accent); display:inline-block; }
+
+/* Title */
+h1.title{
+  font-family: var(--display);
+  font-weight: 500;
+  font-size: var(--type-title);
+  line-height: 1.02;
+  letter-spacing: -0.02em;
+  margin: 0;
+  font-variation-settings: "opsz" 60;
+  text-wrap: balance;
+}
+h1.title em { font-style: italic; color: var(--accent); font-weight: 400; }
+
+.subtitle{
+  font-family: var(--serif);
+  font-style: italic;
+  font-weight: 400;
+  font-size: var(--type-subtitle);
+  line-height: 1.18;
+  color: var(--ink-2);
+  margin: 0;
+  max-width: 1500px;
+  text-wrap: balance;
+}
+
+.head{
+  display:flex; flex-direction:column; gap: 28px;
+  margin-bottom: var(--gap-title);
+}
+
+/* Body text */
+.body-text{
+  font-size: var(--type-body);
+  line-height: 1.42;
+  color: var(--ink-2);
+  max-width: 1300px;
+  text-wrap: pretty;
+}
+
+/* Bulleted list — editorial */
+ul.bullets{
+  list-style: none; padding:0; margin:0;
+  display:flex; flex-direction:column; gap: var(--gap-item);
+}
+ul.bullets li{
+  font-size: var(--type-body);
+  line-height: 1.34;
+  color: var(--ink);
+  display: grid;
+  grid-template-columns: 56px 1fr;
+  align-items: baseline;
+  column-gap: 4px;
+}
+ul.bullets li .mk{
+  font-family: var(--mono);
+  font-size: 24px;
+  color: var(--accent);
+  letter-spacing: 0.04em;
+  transform: translateY(-4px);
+}
+ul.bullets li b{
+  font-weight: 600;
+  color: var(--ink);
+}
+ul.bullets li .dim{
+  display:block;
+  font-size: var(--type-small);
+  color: var(--muted);
+  margin-top: 6px;
+  font-style: italic;
+}
+
+/* Rule */
+.rule{ height:1px; background: var(--rule); border:0; }
+.rule-thick{ height:2px; background: var(--ink); border:0; }
+.rule-accent{ height:2px; background: var(--accent); border:0; width: 96px; }
+
+/* Columns */
+.cols-2{ display:grid; grid-template-columns: 1fr 1fr; gap: 80px; }
+.cols-3{ display:grid; grid-template-columns: 1fr 1fr 1fr; gap: 56px; }
+.cols-4{ display:grid; grid-template-columns: repeat(4, 1fr); gap: 40px; }
+
+/* Column card (no rounded boxes — just rule lines) */
+.col{
+  display:flex; flex-direction:column; gap: 22px;
+  padding-top: 28px;
+  border-top: 2px solid var(--ink);
+}
+.col .col-num{
+  font-family: var(--mono);
+  font-size: 24px;
+  letter-spacing: 0.08em;
+  color: var(--accent);
+}
+.col h3{
+  font-family: var(--display);
+  font-weight: 500;
+  font-size: 42px;
+  line-height: 1.05;
+  margin: 0;
+  letter-spacing: -0.01em;
+}
+.col p{
+  font-size: 26px;
+  line-height: 1.4;
+  color: var(--ink-2);
+  margin: 0;
+}
+
+/* Mono code-ish block */
+.mono-block{
+  font-family: var(--mono);
+  font-size: 24px;
+  line-height: 1.7;
+  color: var(--ink);
+  background: rgba(255,255,255,0.4);
+  border-left: 3px solid var(--accent);
+  padding: 28px 36px;
+}
+
+/* Pull quote slide */
+.pullquote{
+  font-family: var(--display);
+  font-weight: 400;
+  font-style: italic;
+  font-size: 108px;
+  line-height: 1.05;
+  letter-spacing: -0.02em;
+  color: var(--ink);
+  text-wrap: balance;
+  max-width: 1500px;
+  font-variation-settings: "opsz" 72;
+}
+.pullquote .mark{ color: var(--accent); }
+.attribution{
+  font-family: var(--mono);
+  font-size: 24px;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  color: var(--muted);
+  margin-top: 56px;
+}
+
+/* Flow diagram */
+.flow{
+  display:flex; align-items: stretch; gap: 0;
+  margin-top: 16px;
+}
+.flow-step{
+  flex:1; padding: 32px 28px;
+  border-top: 2px solid var(--ink);
+  display:flex; flex-direction: column; gap: 14px;
+}
+.flow-step .n{
+  font-family: var(--mono); font-size: 24px; color: var(--accent); letter-spacing: 0.1em;
+}
+.flow-step h4{
+  font-family: var(--display);
+  font-weight:500; font-size: 38px; margin:0; line-height: 1.05;
+  letter-spacing: -0.01em;
+}
+.flow-step p{
+  font-size: 24px; line-height: 1.4; color: var(--ink-2); margin:0;
+}
+.flow-arrow{
+  width: 56px; display:flex; align-items: flex-start; justify-content: center;
+  padding-top: 32px;
+  color: var(--accent);
+  font-family: var(--mono);
+  font-size: 28px;
+}
+
+/* Cover slide */
+.cover{
+  display:grid; grid-template-rows: auto 1fr auto;
+  padding: 80px var(--pad-x);
+}
+.cover .topbar{
+  display:flex; justify-content: space-between; align-items: baseline;
+  font-family: var(--mono); font-size: 24px; letter-spacing: 0.14em; text-transform: uppercase;
+  color: var(--ink);
+  border-bottom: 2px solid var(--ink);
+  padding-bottom: 18px;
+}
+.cover .topbar span:nth-child(2){ color: var(--accent); }
+.cover .center{
+  display:flex; flex-direction: column; justify-content: center;
+}
+.cover h1.display{
+  font-family: var(--display);
+  font-weight: 500;
+  font-size: var(--type-display);
+  line-height: 0.96;
+  letter-spacing: -0.035em;
+  margin: 0;
+  font-variation-settings: "opsz" 72;
+}
+.cover h1.display em{
+  font-style: italic; color: var(--accent); font-weight: 400;
+}
+.cover .deck-sub{
+  font-style: italic;
+  font-size: 52px;
+  color: var(--ink-2);
+  margin-top: 56px;
+  max-width: 1300px;
+  line-height: 1.15;
+}
+.cover .bottombar{
+  display:flex; justify-content: space-between; align-items: flex-end;
+  border-top: 2px solid var(--ink);
+  padding-top: 22px;
+  font-family: var(--mono);
+  font-size: 24px;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+}
+.cover .byline{ font-family: var(--display); font-style: italic; font-size: 36px; letter-spacing: 0; text-transform: none; color: var(--ink); }
+.cover .byline b{ font-style: normal; font-weight: 600; }
+
+/* Stage layout: large number + content */
+.stage-num{
+  font-family: var(--display);
+  font-weight: 300;
+  font-size: 320px;
+  line-height: 0.85;
+  letter-spacing: -0.05em;
+  color: var(--accent);
+  font-variation-settings: "opsz" 72;
+}
+
+/* Token diagram boxes */
+.tokens{ display:flex; gap: 12px; flex-wrap: wrap; align-items: center; font-family: var(--mono); font-size: 36px; }
+.tokens .tok{
+  background: var(--paper);
+  border: 1.5px solid var(--ink);
+  padding: 14px 22px;
+  border-radius: 4px;
+  color: var(--ink);
+}
+.tokens .tok.next{
+  border-color: var(--accent);
+  color: var(--accent);
+  background: var(--accent-soft);
+  border-style: dashed;
+}
+.tokens .pred{
+  font-family: var(--mono); font-size: 26px; color: var(--muted);
+}
+
+/* Table */
+table.editorial{
+  width: 100%; border-collapse: collapse;
+  font-size: 26px;
+}
+table.editorial th, table.editorial td{
+  text-align: left; padding: 22px 18px;
+  border-bottom: 1px solid var(--rule);
+  vertical-align: top;
+}
+table.editorial th{
+  font-family: var(--mono);
+  font-size: 24px;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  color: var(--muted);
+  font-weight: 500;
+  border-bottom: 2px solid var(--ink);
+}
+table.editorial td.org{
+  font-family: var(--display);
+  font-size: 38px;
+  font-weight: 500;
+}
+table.editorial td.stance{
+  font-style: italic; color: var(--ink-2);
+}
+table.editorial td.models{
+  font-family: var(--mono); font-size: 24px; color: var(--ink-2);
+}
+
+/* Role cards */
+.role{
+  display:flex; flex-direction:column; gap: 14px;
+  border-top: 2px solid var(--ink);
+  padding-top: 22px;
+}
+.role .tag{ font-family: var(--mono); font-size:24px; letter-spacing: 0.1em; color: var(--accent); text-transform:uppercase; }
+.role h4{ font-family: var(--display); font-weight: 500; font-size: 36px; line-height: 1.05; margin:0; letter-spacing:-0.01em; }
+.role p{ font-size: 24px; line-height: 1.4; color: var(--ink-2); margin:0; }
+
+/* Timeline (roadmap) */
+.timeline{ display:grid; grid-template-columns: repeat(4, 1fr); gap: 36px; }
+.timeline .m{
+  display:flex; flex-direction:column; gap: 16px;
+  border-top: 2px solid var(--ink);
+  padding-top: 20px;
+}
+.timeline .m .lbl{
+  font-family: var(--mono);
+  font-size: 24px;
+  letter-spacing: 0.1em;
+  color: var(--accent);
+}
+.timeline .m h4{
+  font-family: var(--display);
+  font-size: 38px;
+  font-weight: 500;
+  margin: 0; line-height: 1.05; letter-spacing: -0.01em;
+}
+.timeline .m ul{
+  list-style: none; padding:0; margin:0;
+  display:flex; flex-direction:column; gap: 12px;
+  font-size: 24px; color: var(--ink-2); line-height: 1.4;
+}
+.timeline .m ul li::before{
+  content: "→ ";
+  font-family: var(--mono);
+  color: var(--accent);
+}
+
+/* Resource list */
+ul.refs{ list-style: none; padding:0; margin:0; display:flex; flex-direction:column; gap: 18px; }
+ul.refs li{
+  font-size: 30px; line-height: 1.3;
+  display: grid; grid-template-columns: 200px 1fr; align-items: baseline; gap: 28px;
+  padding-bottom: 18px;
+  border-bottom: 1px solid var(--rule);
+}
+ul.refs li:last-child{ border-bottom: 0; }
+ul.refs .kind{
+  font-family: var(--mono);
+  font-size: 24px;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  color: var(--muted);
+}
+ul.refs .name{ font-family: var(--display); font-weight: 500; font-size: 32px; letter-spacing: -0.01em; }
+ul.refs .name .it{ font-style: italic; color: var(--ink-2); font-weight: 400; }
+
+/* Section title slides (used for cover & takeaways) */
+.center-stage{
+  flex:1; display:flex; flex-direction: column; justify-content: center;
+}
+
+/* Stat-style display */
+.stat{ font-family: var(--display); font-weight: 500; font-size: 220px; line-height: 0.9; letter-spacing: -0.04em; }
+
+/* Two-up problem/solution */
+.split{
+  display:grid; grid-template-columns: 1fr 1fr; gap: 0;
+  border-top: 2px solid var(--ink);
+}
+.split > div{
+  padding: 32px 56px 0 0;
+}
+.split > div + div{
+  padding-left: 56px;
+  border-left: 1px solid var(--rule);
+  padding-right: 0;
+}
+.split h4{
+  font-family: var(--mono);
+  font-size: 24px;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  margin: 0 0 22px;
+}
+.split .neg{ color: var(--muted); }
+.split .pos{ color: var(--accent); }
+.split p{ font-size: 28px; line-height: 1.4; color: var(--ink); margin: 0 0 18px; max-width: 540px; }
+
+/* Big numbered takeaways */
+.takeaway{
+  display:grid; grid-template-columns: 180px 1fr; gap: 56px; align-items: baseline;
+  padding: 28px 0;
+  border-top: 1px solid var(--rule);
+}
+.takeaway:last-child{ border-bottom: 1px solid var(--rule); }
+.takeaway .big{
+  font-family: var(--display);
+  font-weight: 400;
+  font-style: italic;
+  font-size: 96px;
+  line-height: 1;
+  color: var(--accent);
+  letter-spacing: -0.02em;
+}
+.takeaway .txt{
+  font-family: var(--display);
+  font-size: 42px;
+  font-weight: 500;
+  line-height: 1.12;
+  letter-spacing: -0.01em;
+  text-wrap: balance;
+}
+.takeaway .txt em{ font-style: italic; color: var(--ink-2); font-weight: 400; }
+
+/* Vector space visual */
+.vector-viz{
+  position: relative;
+  width: 100%; height: 100%;
+  font-family: var(--mono);
+  font-size: 24px;
+}
+.vector-viz .axis{
+  position:absolute; background: var(--ink);
+}
+.vector-viz .pt{
+  position:absolute;
+  width: 14px; height: 14px;
+  border-radius: 50%;
+  background: var(--ink);
+  transform: translate(-50%, -50%);
+}
+.vector-viz .pt.accent{ background: var(--accent); width: 18px; height: 18px; }
+.vector-viz .label{
+  position: absolute;
+  white-space: nowrap;
+  transform: translate(14px, -50%);
+  color: var(--ink);
+  font-size: 24px;
+}
+.vector-viz .label.accent{ color: var(--accent); font-weight: 600; }
+.vector-viz .label.muted{ color: var(--muted); }
+
+/* Chip */
+.chip{
+  display: inline-block;
+  font-family: var(--mono);
+  font-size: 24px;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  padding: 6px 14px;
+  border: 1px solid var(--ink);
+  border-radius: 999px;
+  color: var(--ink);
+}
+.chip.accent{ background: var(--ink); color: var(--paper); border-color: var(--ink); }
+
+/* Compact list (for slide w/ many sub items) */
+ul.simple{
+  list-style: none; padding:0; margin:0;
+  display:flex; flex-direction:column; gap: 18px;
+  font-size: 28px; line-height: 1.4; color: var(--ink);
+}
+ul.simple li{ display: grid; grid-template-columns: 30px 1fr; align-items: baseline; }
+ul.simple li::before{
+  content: "—"; color: var(--accent); font-family: var(--mono);
+}
+
+/* Diagonal/asymmetric grid for "landscape" slide */
+.legend{ display:flex; gap: 24px; align-items: center; font-family: var(--mono); font-size: 24px; letter-spacing: 0.1em; color: var(--muted); text-transform: uppercase; margin-top: 16px; }
+.legend .sw{ width: 14px; height: 14px; display:inline-block; margin-right: 8px; vertical-align: middle; }
+.legend .sw.ink{ background: var(--ink); }
+.legend .sw.acc{ background: var(--accent); }
+
+/* Inverse slide — swaps paper/ink to break rhythm, theme-aware */
+deck-stage section.inverse{
+  background: var(--ink);
+  color: var(--paper);
+}
+section.inverse .slide{
+  --ink: var(--paper-swap, #F2EDE2);
+  --ink-2: var(--ink-2-inverse, #CFC4B0);
+  --muted: var(--muted-inverse, #8A7E6E);
+  --rule: var(--rule-inverse, #3A3128);
+  color: var(--ink);
+}
+
+/* Tweaks panel anchor */
+#tweaks-root{ position: fixed; inset: 0; pointer-events: none; }
+#tweaks-root > *{ pointer-events: auto; }
+</style>
+</head>
+<body>
+
+<deck-stage width="1920" height="1080">
+
+  <!-- 1 ──── COVER ───────────────────────────────────────────────── -->
+  <section data-label="01 Cover">
+    <div class="slide cover">
+      <div class="topbar">
+        <span>The GenAI Series · Vol. 01</span>
+        <span>● Live Session</span>
+        <span>May 2026</span>
+      </div>
+
+      <div class="center">
+        <div style="font-family:var(--mono); font-size:24px; letter-spacing:0.14em; text-transform:uppercase; color:var(--accent); margin-bottom: 36px;">A talk on building with language models</div>
+        <h1 class="display">Generative<br/><em>Artificial Intelligence</em></h1>
+        <p class="deck-sub">Building the future, one prompt at a time — from the math underneath to the careers above.</p>
+      </div>
+
+      <div class="bottombar">
+        <div class="byline">By <b>Aman Kadam</b></div>
+        <div>19 Slides · ≈ 50 min</div>
+      </div>
+    </div>
+  </section>
+
+  <!-- 2 ──── ABOUT THIS SESSION ─────────────────────────────────────── -->
+  <section data-label="02 About">
+    <div class="slide">
+      <div class="head">
+        <div class="eyebrow"><span class="num">02</span><span class="bar"></span><span>The Editor's Note</span></div>
+        <h1 class="title">About this session</h1>
+      </div>
+
+      <div class="cols-2" style="margin-top: 24px;">
+        <div>
+          <h4 style="font-family:var(--mono); font-size:24px; letter-spacing:0.12em; text-transform:uppercase; color:var(--muted); margin:0 0 24px;">What we'll cover</h4>
+          <ul class="simple">
+            <li>The shape of GenAI — what it is, how it works</li>
+            <li>Prompting, RAG, embeddings, agents</li>
+            <li>What it takes to ship a real system</li>
+            <li>The job market, freelance opportunities, and a 4-month roadmap</li>
+          </ul>
+        </div>
+        <div>
+          <h4 style="font-family:var(--mono); font-size:24px; letter-spacing:0.12em; text-transform:uppercase; color:var(--muted); margin:0 0 24px;">How we'll run it</h4>
+          <ul class="simple">
+            <li>Ask anything, any time — interruptions welcome</li>
+            <li>No "question" is silly; we're all early to this</li>
+            <li>If a slide sparks a tangent, take it</li>
+            <li>Slides &amp; resources shared at the end</li>
+          </ul>
+          <p class="body-text" style="font-style: italic; color: var(--accent); margin-top: 36px; font-size: 28px;">"Curiosity over credentials."</p>
+        </div>
+      </div>
+
+      <div class="folio"><div><span class="dot"></span>The GenAI Series</div><div>02 / 19</div></div>
+    </div>
+  </section>
+
+  <!-- 3 ──── WHAT IS GENERATIVE AI ───────────────────────────────────── -->
+  <section data-label="03 What is GenAI">
+    <div class="slide">
+      <div class="head">
+        <div class="eyebrow"><span class="num">03</span><span class="bar"></span><span>Definitions</span></div>
+        <h1 class="title">What is <em>generative</em> AI?</h1>
+        <p class="subtitle">AI that doesn't just classify the world — it produces new artifacts inside it. Text, code, images, audio, video.</p>
+      </div>
+
+      <div class="flow" style="margin-top: 40px;">
+        <div class="flow-step">
+          <div class="n">01 · 1950s — 2000s</div>
+          <h4>Rule-based</h4>
+          <p>Humans wrote the rules. The machine followed them. Brittle, narrow, but explainable.</p>
+        </div>
+        <div class="flow-arrow">→</div>
+        <div class="flow-step">
+          <div class="n">02 · 2000s — 2017</div>
+          <h4>Learning-based</h4>
+          <p>Models learned patterns from labeled data — classify, predict, rank. Powerful, but discriminative.</p>
+        </div>
+        <div class="flow-arrow">→</div>
+        <div class="flow-step" style="border-top-color: var(--accent);">
+          <div class="n" style="color:var(--accent);">03 · 2017 — now</div>
+          <h4 style="color:var(--accent);">Generative</h4>
+          <p>Models learn the distribution itself — sample from it to <em>create</em>. The interface becomes language.</p>
+        </div>
+      </div>
+
+      <div class="folio"><div><span class="dot"></span>Foundations</div><div>03 / 19</div></div>
+    </div>
+  </section>
+
+  <!-- 4 ──── HOW LLMs WORK ─────────────────────────────────────────── -->
+  <section data-label="04 How LLMs Work">
+    <div class="slide">
+      <div class="head">
+        <div class="eyebrow"><span class="num">04</span><span class="bar"></span><span>Mechanics</span></div>
+        <h1 class="title">How LLMs work, <em>simply</em></h1>
+      </div>
+
+      <p class="body-text" style="margin:0 0 40px; max-width: 1500px;">An LLM is a machine that predicts the next <b>token</b> — a fragment of text — given everything before it. Repeat the prediction, and you get a paragraph. Scale the parameters, and the predictions become strikingly fluent.</p>
+
+      <div style="margin-bottom: 36px;">
+        <div style="font-family:var(--mono); font-size:24px; letter-spacing:0.12em; text-transform:uppercase; color:var(--muted); margin-bottom: 18px;">Tokens in, token out</div>
+        <div class="tokens">
+          <span class="tok">The</span><span class="tok">cat</span><span class="tok">sat</span><span class="tok">on</span><span class="tok">the</span><span class="pred">→</span><span class="tok next">mat</span>
+          <span style="font-family:var(--mono); font-size:24px; color:var(--muted); margin-left: 28px;"># P(mat)=0.41 · P(floor)=0.18 · P(roof)=0.04</span>
+        </div>
+      </div>
+
+      <div class="cols-3" style="margin-top: 20px;">
+        <div class="col">
+          <div class="col-num">CONCEPT · 01</div>
+          <h3>Tokens</h3>
+          <p>Sub-word chunks the model actually sees. "Tokenization" ≠ words.</p>
+        </div>
+        <div class="col">
+          <div class="col-num">CONCEPT · 02</div>
+          <h3>Context window</h3>
+          <p>How much text it can hold at once. The model's short-term memory.</p>
+        </div>
+        <div class="col">
+          <div class="col-num">CONCEPT · 03</div>
+          <h3>Parameters</h3>
+          <p>The learned weights — billions of them. Scale is most of the magic.</p>
+        </div>
+      </div>
+
+      <div class="folio"><div><span class="dot"></span>Foundations</div><div>04 / 19</div></div>
+    </div>
+  </section>
+
+  <!-- 5 ──── THE LANDSCAPE ──────────────────────────────────────────── -->
+  <section data-label="05 The Landscape">
+    <div class="slide" style="background: #1A1612; color: var(--paper); --ink: #F2EDE2; --ink-2: #CFC4B0; --muted: #8A7E6E; --rule: #3A3128;">
+      <div class="head">
+        <div class="eyebrow" style="color: var(--accent);"><span class="num" style="color: var(--muted);">05</span><span class="bar"></span><span>The Map</span></div>
+        <h1 class="title">The landscape, today</h1>
+        <p class="subtitle" style="color: var(--ink-2);">Four labs define the frontier. A long tail of open-source models is closing the gap faster than anyone predicted.</p>
+      </div>
+
+      <table class="editorial" style="margin-top: 24px;">
+        <thead>
+          <tr><th style="width: 22%;">Lab</th><th style="width: 30%;">Flagship</th><th style="width: 22%;">Stance</th><th>Known for</th></tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td class="org" style="color: var(--paper);">OpenAI</td>
+            <td class="models" style="color: var(--ink-2);">GPT family · o-series</td>
+            <td class="stance" style="color: var(--ink-2);">Closed, API-first</td>
+            <td class="stance" style="color: var(--ink-2);">Reasoning, broad consumer reach</td>
+          </tr>
+          <tr>
+            <td class="org" style="color: var(--paper);">Anthropic</td>
+            <td class="models" style="color: var(--ink-2);">Claude family</td>
+            <td class="stance" style="color: var(--ink-2);">Closed, safety-led</td>
+            <td class="stance" style="color: var(--ink-2);">Long context, careful tone, coding</td>
+          </tr>
+          <tr>
+            <td class="org" style="color: var(--paper);">Google DeepMind</td>
+            <td class="models" style="color: var(--ink-2);">Gemini family</td>
+            <td class="stance" style="color: var(--ink-2);">Closed, ecosystem-led</td>
+            <td class="stance" style="color: var(--ink-2);">Multi-modal, search integration</td>
+          </tr>
+          <tr>
+            <td class="org" style="color: var(--paper);">Meta &amp; the open camp</td>
+            <td class="models" style="color: var(--ink-2);">Llama · Mistral · Qwen</td>
+            <td class="stance" style="color: var(--accent);">Open weights</td>
+            <td class="stance" style="color: var(--ink-2);">Self-host, fine-tune, run cheaply</td>
+          </tr>
+        </tbody>
+      </table>
+
+      <p class="body-text" style="margin-top: 40px; font-style: italic; color: var(--ink-2);">Where it's headed → smaller, cheaper, multi-modal, agentic.</p>
+
+      <div class="folio" style="color: var(--muted);"><div><span class="dot"></span>The Map</div><div>05 / 19</div></div>
+    </div>
+  </section>
+
+  <!-- 6 ──── PROMPTING IS ENGINEERING ───────────────────────────────── -->
+  <section data-label="06 Prompting">
+    <div class="slide">
+      <div class="head">
+        <div class="eyebrow"><span class="num">06</span><span class="bar"></span><span>Practice</span></div>
+        <h1 class="title">Prompting is <em>engineering</em></h1>
+        <p class="subtitle">A prompt is a specification. The clearer the spec, the more reliable the system. Three patterns cover most of the ground.</p>
+      </div>
+
+      <div class="cols-3" style="margin-top: 16px;">
+        <div class="col">
+          <div class="col-num">PATTERN · 01</div>
+          <h3>Zero-shot</h3>
+          <p>Just ask. No examples. Fine for well-known tasks the model has seen a million times.</p>
+          <div class="mono-block" style="font-size:24px; padding: 18px 22px;">"Summarize this email in one sentence."</div>
+        </div>
+        <div class="col">
+          <div class="col-num">PATTERN · 02</div>
+          <h3>Few-shot</h3>
+          <p>Show the model two or three examples of the input → output shape. It will copy the pattern.</p>
+          <div class="mono-block" style="font-size:24px; padding: 18px 22px;">"Input: cat → Output: feline<br/>Input: dog → Output: canine<br/>Input: horse → Output:"</div>
+        </div>
+        <div class="col">
+          <div class="col-num">PATTERN · 03</div>
+          <h3>Chain&#8209;of&#8209;thought</h3>
+          <p>Ask the model to think step by step. Reasoning quality jumps; especially on math, logic, and code.</p>
+          <div class="mono-block" style="font-size:24px; padding: 18px 22px;">"Let's solve this step by step. First, …"</div>
+        </div>
+      </div>
+
+      <p class="body-text" style="margin-top: 56px; font-style:italic;">Common beginner mistakes — vague verbs, missing constraints, no examples, and asking for "creative" output without a frame.</p>
+
+      <div class="folio"><div><span class="dot"></span>Practice</div><div>06 / 19</div></div>
+    </div>
+  </section>
+
+  <!-- 7 ──── HALLUCINATION ──────────────────────────────────────────── -->
+  <section data-label="07 Hallucination">
+    <div class="slide">
+      <div class="head">
+        <div class="eyebrow"><span class="num">07</span><span class="bar"></span><span>The Failure Mode</span></div>
+      </div>
+
+      <div class="center-stage">
+        <p class="pullquote">An LLM does not know what is <em>true</em>. <span class="mark">It knows what is likely.</span></p>
+        <p class="body-text" style="margin-top: 56px; max-width: 1500px;">That gap — between <em>likely</em> and <em>true</em> — is where hallucinations live. The model invents a plausible answer because plausibility is what it was trained to produce. The fix is not "tell it not to" — the fix is architectural: ground the model in real sources (next slide), constrain outputs, and verify before you trust.</p>
+
+        <div style="display:flex; gap: 36px; margin-top: 56px; font-family: var(--mono); font-size: 24px; color: var(--muted); letter-spacing: 0.08em; text-transform: uppercase;">
+          <span><span style="color: var(--accent); margin-right: 8px;">●</span>FAKE CITATIONS</span>
+          <span><span style="color: var(--accent); margin-right: 8px;">●</span>INVENTED APIs</span>
+          <span><span style="color: var(--accent); margin-right: 8px;">●</span>CONFIDENT NONSENSE</span>
+          <span><span style="color: var(--accent); margin-right: 8px;">●</span>STALE FACTS</span>
+        </div>
+      </div>
+
+      <div class="folio"><div><span class="dot"></span>Practice</div><div>07 / 19</div></div>
+    </div>
+  </section>
+
+  <!-- 8 ──── RAG ────────────────────────────────────────────────────── -->
+  <section data-label="08 RAG">
+    <div class="slide">
+      <div class="head">
+        <div class="eyebrow"><span class="num">08</span><span class="bar"></span><span>Architecture</span></div>
+        <h1 class="title">Retrieval&#8209;Augmented Generation</h1>
+        <p class="subtitle">Give the model an open book. Before it answers, fetch the relevant pages — then let it read and write.</p>
+      </div>
+
+      <div class="flow" style="margin-top: 32px;">
+        <div class="flow-step">
+          <div class="n">STEP · 01</div>
+          <h4>Retrieve</h4>
+          <p>Search your own data (docs, tickets, code) for chunks relevant to the user's question.</p>
+        </div>
+        <div class="flow-arrow">→</div>
+        <div class="flow-step">
+          <div class="n">STEP · 02</div>
+          <h4>Augment</h4>
+          <p>Stuff those chunks into the prompt as context. "Here are the facts. Answer using only these."</p>
+        </div>
+        <div class="flow-arrow">→</div>
+        <div class="flow-step">
+          <div class="n">STEP · 03</div>
+          <h4>Generate</h4>
+          <p>The model writes the answer, grounded in retrieved evidence — and cites it.</p>
+        </div>
+      </div>
+
+      <div class="split" style="margin-top: 80px;">
+        <div>
+          <h4 class="neg">Closed-book exam</h4>
+          <p>Answer from memory alone. Confident — often wrong. Frozen at training time.</p>
+        </div>
+        <div>
+          <h4 class="pos">Open-book exam</h4>
+          <p>Look it up first, then write. Slower, but defensible — and always up to date.</p>
+        </div>
+      </div>
+
+      <div class="folio"><div><span class="dot"></span>Architecture</div><div>08 / 19</div></div>
+    </div>
+  </section>
+
+  <!-- 9 ──── EMBEDDINGS ─────────────────────────────────────────────── -->
+  <section data-label="09 Embeddings">
+    <div class="slide">
+      <div class="head">
+        <div class="eyebrow"><span class="num">09</span><span class="bar"></span><span>Architecture</span></div>
+        <h1 class="title">Embeddings &amp; vector databases</h1>
+      </div>
+
+      <div class="cols-2" style="gap: 80px;">
+        <div>
+          <p class="body-text">An <b>embedding</b> turns a piece of text into a list of numbers — a coordinate in a high-dimensional space. Texts that mean similar things land near each other. Cosine distance between vectors becomes semantic similarity.</p>
+
+          <p class="body-text" style="margin-top: 28px;">A <b>vector database</b> stores millions of these embeddings and finds nearest neighbors in milliseconds. It is the backbone of every RAG system.</p>
+
+          <div style="display:flex; gap: 14px; margin-top: 44px; flex-wrap: wrap;">
+            <span class="chip accent">pgvector</span>
+            <span class="chip">Pinecone</span>
+            <span class="chip">Chroma</span>
+            <span class="chip">Weaviate</span>
+            <span class="chip">Qdrant</span>
+          </div>
+        </div>
+
+        <div style="position:relative; min-height: 520px;">
+          <div style="font-family: var(--mono); font-size: 24px; letter-spacing: 0.12em; text-transform: uppercase; color: var(--muted); margin-bottom: 24px;">Semantic space, sketched</div>
+          <div class="vector-viz" style="position: relative; width: 100%; height: 460px; border-left: 1.5px solid var(--ink); border-bottom: 1.5px solid var(--ink); padding: 0;">
+            <!-- cluster: animals -->
+            <div class="pt" style="left: 22%; top: 28%;"></div>
+            <div class="label" style="left: 22%; top: 28%;">"dog"</div>
+            <div class="pt" style="left: 32%; top: 50%;"></div>
+            <div class="label" style="left: 32%; top: 50%;">"puppy"</div>
+            <div class="pt" style="left: 15%; top: 56%;"></div>
+            <div class="label" style="left: 15%; top: 56%;">"cat"</div>
+
+            <!-- cluster: vehicles -->
+            <div class="pt" style="left: 65%; top: 22%;"></div>
+            <div class="label" style="left: 65%; top: 22%;">"car"</div>
+            <div class="pt" style="left: 72%; top: 30%;"></div>
+            <div class="label" style="left: 72%; top: 30%;">"truck"</div>
+            <div class="pt" style="left: 78%; top: 18%;"></div>
+            <div class="label" style="left: 78%; top: 18%;">"sedan"</div>
+
+            <!-- query -->
+            <div class="pt accent" style="left: 20%; top: 40%;"></div>
+            <div class="label accent" style="left: 20%; top: 40%;">query: "canine"</div>
+
+            <!-- random other -->
+            <div class="pt" style="left: 52%; top: 72%;"></div>
+            <div class="label muted" style="left: 52%; top: 72%;">"democracy"</div>
+            <div class="pt" style="left: 78%; top: 80%;"></div>
+            <div class="label muted" style="left: 78%; top: 80%;">"jazz"</div>
+          </div>
+          <div class="legend"><span><span class="sw acc"></span>QUERY</span><span><span class="sw ink"></span>NEAREST NEIGHBORS</span></div>
+        </div>
+      </div>
+
+      <div class="folio"><div><span class="dot"></span>Architecture</div><div>09 / 19</div></div>
+    </div>
+  </section>
+
+  <!-- 10 ──── AGENTS & WORKFLOWS ─────────────────────────────────────── -->
+  <section data-label="10 Agents">
+    <div class="slide">
+      <div class="head">
+        <div class="eyebrow"><span class="num">10</span><span class="bar"></span><span>Architecture</span></div>
+        <h1 class="title">Agents &amp; workflows</h1>
+        <p class="subtitle">A single prompt is one move. An <em>agent</em> is a game: the model plans, calls tools, reads results, and decides what to do next.</p>
+      </div>
+
+      <div class="cols-2" style="gap: 80px; margin-top: 24px;">
+        <div>
+          <h4 style="font-family:var(--mono); font-size:24px; letter-spacing:0.12em; text-transform:uppercase; color:var(--muted); margin:0 0 24px;">The loop</h4>
+          <ul class="bullets">
+            <li><span class="mk">→</span><span><b>Plan</b> — break the goal into sub-tasks</span></li>
+            <li><span class="mk">→</span><span><b>Act</b> — call a tool (search, code, DB, API)</span></li>
+            <li><span class="mk">→</span><span><b>Observe</b> — read the result back into context</span></li>
+            <li><span class="mk">→</span><span><b>Decide</b> — try the next step, or stop</span></li>
+          </ul>
+        </div>
+
+        <div>
+          <h4 style="font-family:var(--mono); font-size:24px; letter-spacing:0.12em; text-transform:uppercase; color:var(--muted); margin:0 0 24px;">What you'll actually use</h4>
+          <ul class="bullets">
+            <li><span class="mk">01</span><span><b>Tool / function calling</b> — typed actions the model can invoke</span></li>
+            <li><span class="mk">02</span><span><b>Structured outputs</b> — JSON schemas, not free text</span></li>
+            <li><span class="mk">03</span><span><b>LangGraph / state machines</b> — explicit nodes &amp; edges<span class="dim">When chains aren't enough, graphs are.</span></span></li>
+          </ul>
+        </div>
+      </div>
+
+      <div class="folio"><div><span class="dot"></span>Architecture</div><div>10 / 19</div></div>
+    </div>
+  </section>
+
+  <!-- 11 ──── BUILDING IN PRODUCTION ─────────────────────────────────── -->
+  <section data-label="11 Production">
+    <div class="slide">
+      <div class="head">
+        <div class="eyebrow"><span class="num">11</span><span class="bar"></span><span>Practice</span></div>
+        <h1 class="title">Building in production</h1>
+        <p class="subtitle">The part they don't teach you: making a demo that wins a hackathon is one thing. Making it not fall over at 3 a.m. on a Tuesday is another.</p>
+      </div>
+
+      <div class="cols-3" style="margin-top: 28px;">
+        <div class="col">
+          <div class="col-num">CONCERN · 01</div>
+          <h3>Clean architecture</h3>
+          <p>Service layers, dependency injection, typed interfaces. FastAPI + Pydantic is a great starting stack. Don't put your prompts in your route handlers.</p>
+        </div>
+        <div class="col">
+          <div class="col-num">CONCERN · 02</div>
+          <h3>Reliability &amp; cost</h3>
+          <p>Models fail. Retries, timeouts, fallbacks, caching. Track tokens per request like you'd track DB queries — they're your new bill.</p>
+        </div>
+        <div class="col">
+          <div class="col-num">CONCERN · 03</div>
+          <h3>Evaluation</h3>
+          <p>You can't ship what you can't measure. Build a small eval set early. Diff outputs across model versions. Prompts <em>are</em> code.</p>
+        </div>
+      </div>
+
+      <p class="body-text" style="margin-top: 64px; font-style: italic; color: var(--accent); font-size: 34px;">A boring backend with a great LLM &nbsp;&gt;&nbsp; a great LLM with a chaotic backend.</p>
+
+      <div class="folio"><div><span class="dot"></span>Practice</div><div>11 / 19</div></div>
+    </div>
+  </section>
+
+  <!-- 12 ──── FINE-TUNING ────────────────────────────────────────────── -->
+  <section data-label="12 Fine-tuning">
+    <div class="slide">
+      <div class="head">
+        <div class="eyebrow"><span class="num">12</span><span class="bar"></span><span>Optimization</span></div>
+        <h1 class="title">Fine-tuning &amp; model optimization</h1>
+      </div>
+
+      <div class="split" style="margin-top: 32px;">
+        <div>
+          <h4 class="neg">When NOT to fine-tune</h4>
+          <p>You haven't tried better prompts yet.</p>
+          <p>You don't have a clean dataset.</p>
+          <p>The base model already does the task ≥ 90% well.</p>
+          <p>You need facts to stay current — that's a RAG problem.</p>
+        </div>
+        <div>
+          <h4 class="pos">When fine-tuning earns its keep</h4>
+          <p>You need a consistent <em>style</em> or output format.</p>
+          <p>You're running a narrow, repetitive domain task.</p>
+          <p>You want a small model to do what a big model does — cheaper, faster, on your own hardware.</p>
+        </div>
+      </div>
+
+      <div style="margin-top: 56px;">
+        <h4 style="font-family:var(--mono); font-size:24px; letter-spacing:0.12em; text-transform:uppercase; color:var(--muted); margin:0 0 22px;">The vocabulary you'll see</h4>
+        <div style="display:flex; gap: 14px; flex-wrap: wrap;">
+          <span class="chip">SFT</span>
+          <span class="chip">LoRA</span>
+          <span class="chip">QLoRA</span>
+          <span class="chip">Quantization · 4-bit / 8-bit</span>
+          <span class="chip">Distillation</span>
+          <span class="chip accent">Small Language Models</span>
+        </div>
+      </div>
+
+      <div class="folio"><div><span class="dot"></span>Optimization</div><div>12 / 19</div></div>
+    </div>
+  </section>
+
+  <!-- 13 ──── CAREER PATHS ──────────────────────────────────────────── -->
+  <section data-label="13 Career Paths">
+    <div class="slide">
+      <div class="head">
+        <div class="eyebrow"><span class="num">13</span><span class="bar"></span><span>The Market</span></div>
+        <h1 class="title">Career paths in GenAI</h1>
+        <p class="subtitle">Four flavors. Most people drift between them — but it helps to know what each one actually looks like.</p>
+      </div>
+
+      <div class="cols-4" style="margin-top: 32px;">
+        <div class="role">
+          <span class="tag">Role · 01</span>
+          <h4>AI / ML Engineer</h4>
+          <p>Ships ML systems end-to-end. Owns pipelines, training jobs, and the infrastructure underneath. The deepest path.</p>
+        </div>
+        <div class="role">
+          <span class="tag">Role · 02</span>
+          <h4>Backend AI Developer</h4>
+          <p>Builds the APIs, RAG pipelines, and agent loops on top of foundation models. The fastest-growing path right now.</p>
+        </div>
+        <div class="role">
+          <span class="tag">Role · 03</span>
+          <h4>Prompt Engineer</h4>
+          <p>Specializes in eliciting reliable behavior from models — evals, prompt patterns, guardrails. Often hybrid with a product or QA role.</p>
+        </div>
+        <div class="role">
+          <span class="tag">Role · 04</span>
+          <h4>AI Researcher</h4>
+          <p>Pushes the frontier itself — new architectures, training methods, alignment. Usually a PhD path, or strong publications.</p>
+        </div>
+      </div>
+
+      <p class="body-text" style="margin-top: 56px;">Skills that matter most: <b>Python</b>, system design for AI, API integration, and a portfolio of <em>real</em> things you've shipped.</p>
+
+      <div class="folio"><div><span class="dot"></span>The Market</div><div>13 / 19</div></div>
+    </div>
+  </section>
+
+  <!-- 14 ──── WHAT COMPANIES HIRE FOR ────────────────────────────────── -->
+  <section data-label="14 Hiring">
+    <div class="slide">
+      <div class="head">
+        <div class="eyebrow"><span class="num">14</span><span class="bar"></span><span>The Market</span></div>
+        <h1 class="title">What companies are <em>actually</em> hiring for</h1>
+      </div>
+
+      <div class="cols-2" style="gap: 96px; margin-top: 24px;">
+        <div>
+          <ul class="bullets">
+            <li><span class="mk">01</span><span><b>Python proficiency</b><span class="dim">Non-negotiable. Not "I did a course." Fluent.</span></span></li>
+            <li><span class="mk">02</span><span><b>API integration</b><span class="dim">Calling LLMs, handling retries, streaming, structured output.</span></span></li>
+            <li><span class="mk">03</span><span><b>RAG &amp; vector databases</b><span class="dim">Chunking, embeddings, retrieval evals. Most asked-for skill right now.</span></span></li>
+            <li><span class="mk">04</span><span><b>Agentic systems</b><span class="dim">Tool calling, multi-step orchestration, observability.</span></span></li>
+          </ul>
+        </div>
+
+        <div>
+          <h4 style="font-family:var(--mono); font-size:24px; letter-spacing:0.12em; text-transform:uppercase; color:var(--muted); margin:0 0 28px;">Beyond the keywords</h4>
+          <p class="body-text" style="font-size: 30px;">What separates a junior from a senior in this space isn't more frameworks. It's <b>system design thinking</b> — knowing when a problem is a prompt, a RAG, a fine-tune, or a plain old SQL query.</p>
+          <p class="body-text" style="font-size: 28px; font-style: italic; margin-top: 28px; color: var(--accent);">"Engineering discipline + AI knowledge" is the rare combination companies pay for.</p>
+        </div>
+      </div>
+
+      <div class="folio"><div><span class="dot"></span>The Market</div><div>14 / 19</div></div>
+    </div>
+  </section>
+
+  <!-- 15 ──── FREELANCE & STARTUPS ───────────────────────────────────── -->
+  <section data-label="15 Freelance">
+    <div class="slide">
+      <div class="head">
+        <div class="eyebrow"><span class="num">15</span><span class="bar"></span><span>The Market</span></div>
+        <h1 class="title">Freelance &amp; startup opportunity</h1>
+        <p class="subtitle">Most local businesses know they should be using AI. Almost none of them know how. That gap is the opportunity.</p>
+      </div>
+
+      <div class="cols-2" style="gap: 96px; margin-top: 24px;">
+        <div>
+          <h4 style="font-family:var(--mono); font-size:24px; letter-spacing:0.12em; text-transform:uppercase; color:var(--muted); margin:0 0 24px;">Where the work is</h4>
+          <ul class="simple">
+            <li>Workflow automations &amp; internal copilots</li>
+            <li>Document processing (invoices, contracts, intake forms)</li>
+            <li>Customer-support bots grounded in their docs</li>
+            <li>Lead-gen and content pipelines</li>
+            <li>Bespoke RAG on a company's own knowledge base</li>
+          </ul>
+        </div>
+        <div>
+          <h4 style="font-family:var(--mono); font-size:24px; letter-spacing:0.12em; text-transform:uppercase; color:var(--muted); margin:0 0 24px;">Why now</h4>
+          <p class="body-text" style="font-size: 30px;">Big-tech consultants are too expensive. The competition at the local and regional level is still thin. A working prototype solves the trust problem faster than a deck.</p>
+          <p class="body-text" style="font-size: 28px; font-style: italic; margin-top: 28px;">Charge for the outcome, not the hours.</p>
+        </div>
+      </div>
+
+      <div class="folio"><div><span class="dot"></span>The Market</div><div>15 / 19</div></div>
+    </div>
+  </section>
+
+  <!-- 16 ──── ROADMAP ────────────────────────────────────────────────── -->
+  <section data-label="16 Roadmap">
+    <div class="slide">
+      <div class="head">
+        <div class="eyebrow"><span class="num">16</span><span class="bar"></span><span>The Path</span></div>
+        <h1 class="title">A practical 4-month roadmap</h1>
+      </div>
+
+      <div class="timeline" style="margin-top: 32px;">
+        <div class="m">
+          <span class="lbl">MONTH · 01</span>
+          <h4>Foundations</h4>
+          <ul>
+            <li>Python — modules, types, async</li>
+            <li>The OpenAI / Anthropic API</li>
+            <li>Prompting patterns: zero-shot, few-shot, CoT</li>
+            <li>One small project — a CLI that does something useful</li>
+          </ul>
+        </div>
+        <div class="m">
+          <span class="lbl">MONTH · 02</span>
+          <h4>Retrieval</h4>
+          <ul>
+            <li>Chunking &amp; embedding strategies</li>
+            <li>pgvector or Chroma</li>
+            <li>Build a RAG app on your own notes / a public dataset</li>
+            <li>Measure: groundedness, faithfulness</li>
+          </ul>
+        </div>
+        <div class="m">
+          <span class="lbl">MONTH · 03</span>
+          <h4>Agents</h4>
+          <ul>
+            <li>Function / tool calling</li>
+            <li>Structured outputs, JSON schemas</li>
+            <li>LangGraph (or your own state machine)</li>
+            <li>Add a real tool: search, code-runner, DB</li>
+          </ul>
+        </div>
+        <div class="m">
+          <span class="lbl">MONTH · 04+</span>
+          <h4>Ship it</h4>
+          <ul>
+            <li>Fine-tune a small open model with LoRA</li>
+            <li>Deploy on a cheap GPU / serverless</li>
+            <li>Write it up — blog, GitHub, LinkedIn</li>
+            <li>Charge someone money for it</li>
+          </ul>
+        </div>
+      </div>
+
+      <div class="folio"><div><span class="dot"></span>The Path</div><div>16 / 19</div></div>
+    </div>
+  </section>
+
+  <!-- 17 ──── RESOURCES ──────────────────────────────────────────────── -->
+  <section data-label="17 Resources">
+    <div class="slide">
+      <div class="head">
+        <div class="eyebrow"><span class="num">17</span><span class="bar"></span><span>Further Reading</span></div>
+        <h1 class="title">Resources worth your time</h1>
+        <p class="subtitle">Skim everything. Finish a few. Build alongside whatever you're learning — passive reading rots fast in this field.</p>
+      </div>
+
+      <ul class="refs" style="margin-top: 24px;">
+        <li>
+          <span class="kind">Video · Free</span>
+          <div>
+            <div class="name">Andrej Karpathy <span class="it">on YouTube</span></div>
+            <div style="font-size: 24px; color: var(--muted); margin-top: 8px;">"Neural Networks: Zero to Hero" — non-negotiable. Watch all of it.</div>
+          </div>
+        </li>
+        <li>
+          <span class="kind">Course · Free</span>
+          <div>
+            <div class="name">DeepLearning.AI <span class="it">short courses</span></div>
+            <div style="font-size: 24px; color: var(--muted); margin-top: 8px;">Bite-sized, hands-on. Especially the ones on RAG, agents, and evals.</div>
+          </div>
+        </li>
+        <li>
+          <span class="kind">Hands-on</span>
+          <div>
+            <div class="name">Hugging Face <span class="it">courses &amp; cookbook</span></div>
+            <div style="font-size: 24px; color: var(--muted); margin-top: 8px;">Open models, datasets, and the best practical NLP reference on the internet.</div>
+          </div>
+        </li>
+        <li>
+          <span class="kind">Course · Free</span>
+          <div>
+            <div class="name">fast.ai <span class="it">— Practical Deep Learning</span></div>
+            <div style="font-size: 24px; color: var(--muted); margin-top: 8px;">Top-down teaching. You build first, derive the math later.</div>
+          </div>
+        </li>
+        <li>
+          <span class="kind">Habit</span>
+          <div>
+            <div class="name">Build in public <span class="it">on GitHub + LinkedIn</span></div>
+            <div style="font-size: 24px; color: var(--muted); margin-top: 8px;">Your portfolio is your résumé. One repo &gt; ten certificates.</div>
+          </div>
+        </li>
+      </ul>
+
+      <div class="folio"><div><span class="dot"></span>Further Reading</div><div>17 / 19</div></div>
+    </div>
+  </section>
+
+  <!-- 18 ──── THE MINDSET SHIFT ──────────────────────────────────────── -->
+  <section data-label="18 Mindset">
+    <div class="slide" style="background: #1A1612; color: var(--paper); --ink:#F2EDE2; --ink-2:#CFC4B0; --muted:#8A7E6E;">
+      <div class="head">
+        <div class="eyebrow" style="color: var(--accent);"><span class="num" style="color: var(--muted);">18</span><span class="bar"></span><span>The Mindset</span></div>
+      </div>
+
+      <div class="center-stage">
+        <p class="pullquote">Don't just <em>use</em> AI tools. <span class="mark">Build with them.</span></p>
+
+        <div style="display:grid; grid-template-columns: 1fr 1fr 1fr; gap: 56px; margin-top: 96px; border-top: 1px solid #3A3128; padding-top: 40px;">
+          <div>
+            <div style="font-family:var(--mono); font-size:24px; letter-spacing:0.12em; text-transform:uppercase; color: var(--accent); margin-bottom: 14px;">01 · Posture</div>
+            <p style="font-family:var(--display); font-size:32px; line-height: 1.2; margin:0; font-style: italic;">Curiosity beats credentials right now. The field is too new for gatekeeping to stick.</p>
+          </div>
+          <div>
+            <div style="font-family:var(--mono); font-size:24px; letter-spacing:0.12em; text-transform:uppercase; color: var(--accent); margin-bottom: 14px;">02 · Depth</div>
+            <p style="font-family:var(--display); font-size:32px; line-height: 1.2; margin:0; font-style: italic;">Understanding how the thing works will outlast every framework you'll learn this year.</p>
+          </div>
+          <div>
+            <div style="font-family:var(--mono); font-size:24px; letter-spacing:0.12em; text-transform:uppercase; color: var(--accent); margin-bottom: 14px;">03 · Timing</div>
+            <p style="font-family:var(--display); font-size:32px; line-height: 1.2; margin:0; font-style: italic;">The best time to start was a year ago. The second-best time is tonight.</p>
+          </div>
+        </div>
+      </div>
+
+      <div class="folio" style="color: var(--muted);"><div><span class="dot"></span>The Mindset</div><div>18 / 19</div></div>
+    </div>
+  </section>
+
+  <!-- 19 ──── KEY TAKEAWAYS ──────────────────────────────────────────── -->
+  <section data-label="19 Takeaways">
+    <div class="slide">
+      <div class="head">
+        <div class="eyebrow"><span class="num">19</span><span class="bar"></span><span>The Close</span></div>
+        <h1 class="title">Key takeaways</h1>
+      </div>
+
+      <div style="margin-top: 16px;">
+        <div class="takeaway" style="padding: 28px 0;">
+          <div class="big">01</div>
+          <div class="txt">Generative AI is a <em>platform shift</em> — not a trend. Treat it like the web in 2002 or mobile in 2008.</div>
+        </div>
+        <div class="takeaway" style="padding: 28px 0;">
+          <div class="big">02</div>
+          <div class="txt">Engineering discipline + AI knowledge is a <em>rare combination</em>. Be the person with both.</div>
+        </div>
+        <div class="takeaway" style="padding: 28px 0;">
+          <div class="big">03</div>
+          <div class="txt">Start small. Build real things. <em>Learn publicly.</em></div>
+        </div>
+      </div>
+
+      <div style="margin-top: 40px; display:flex; justify-content:space-between; align-items:flex-end;">
+        <div>
+          <div style="font-family:var(--mono); font-size:24px; letter-spacing:0.14em; text-transform:uppercase; color: var(--muted);">Questions?</div>
+          <div style="font-family: var(--display); font-style: italic; font-size: 44px; margin-top: 8px; color: var(--ink);">Thank you.</div>
+        </div>
+        <div style="text-align: right; font-family: var(--mono); font-size: 24px; letter-spacing: 0.1em; color: var(--muted); text-transform: uppercase;">
+          Aman Kadam<br/>
+          <span style="color: var(--accent);">The GenAI Series · Vol. 01</span>
+        </div>
+      </div>
+
+      <div class="folio"><div><span class="dot"></span>The Close</div><div>19 / 19</div></div>
+    </div>
+  </section>
+
+</deck-stage>
+
+<div id="tweaks-root"></div>
+
+<script src="deck-stage.js"></script>
+
+<!-- React + Babel for Tweaks panel -->
+<script src="https://unpkg.com/react@18.3.1/umd/react.development.js" integrity="sha384-hD6/rw4ppMLGNu3tX5cjIb+uRZ7UkRJ6BPkLpg4hAu/6onKUg4lLsHAs9EBPT82L" crossorigin="anonymous"></script>
+<script src="https://unpkg.com/react-dom@18.3.1/umd/react-dom.development.js" integrity="sha384-u6aeetuaXnQ38mYT8rp6sbXaQe3NL9t+IBXmnYxwkUI2Hw4bsp2Wvmx4yRQF1uAm" crossorigin="anonymous"></script>
+<script src="https://unpkg.com/@babel/standalone@7.29.0/babel.min.js" integrity="sha384-m08KidiNqLdpJqLq95G/LEi8Qvjl/xUYll3QILypMoQ65QorJ9Lvtp2RXYGBFj1y" crossorigin="anonymous"></script>
+<script type="text/babel" src="tweaks-panel.jsx"></script>
+
+<script type="text/babel">
+const TWEAK_DEFAULTS = /*EDITMODE-BEGIN*/{
+  "palette": [
+    "#F2EDE2",
+    "#1A1612",
+    "#B0492C"
+  ],
+  "fontPair": "newsreader",
+  "showFolio": true
+}/*EDITMODE-END*/;
+
+const PALETTES = [
+  ["#F2EDE2","#1A1612","#B0492C"],   // cream + sienna  (default editorial)
+  ["#EFE9DF","#1A1612","#6B4226"],   // cream + warm brown
+  ["#ECE6D8","#1A1A1A","#6B2737"],   // cream + claret
+  ["#E8E4DC","#16221B","#2E6B4F"],   // cream + forest
+  ["#1A1612","#F2EDE2","#D97757"],   // dark mode + sienna
+];
+
+const FONT_PAIRS = {
+  newsreader: { display: '"Newsreader", Georgia, serif',        serif: '"Newsreader", Georgia, serif' },
+  playfair:   { display: '"Playfair Display", Georgia, serif',  serif: '"Source Serif 4", Georgia, serif' },
+  source:     { display: '"Source Serif 4", Georgia, serif',    serif: '"Source Serif 4", Georgia, serif' },
+};
+
+function applyTweaks(t) {
+  const root = document.documentElement;
+  const [paper, ink, accent] = t.palette;
+  root.style.setProperty('--paper', paper);
+  root.style.setProperty('--ink', ink);
+  // derive ink-2, muted, rule from accent/ink contrast
+  const isDark = paper === '#1A1612' || paper.toLowerCase() === '#1a1612';
+  root.style.setProperty('--ink-2', isDark ? '#CFC4B0' : '#3A3128');
+  root.style.setProperty('--muted', isDark ? '#8A7E6E' : '#7A6E5E');
+  root.style.setProperty('--rule', isDark ? '#3A3128' : '#D8CFBE');
+  root.style.setProperty('--accent', accent);
+  root.style.setProperty('--accent-soft', accent + '22');
+  document.body.style.background = ink;
+
+  // Inverse-slide tokens (swap paper/ink for accent slides 05 + 18)
+  // We want the inverse slide to look like the *opposite* theme.
+  root.style.setProperty('--paper-swap', paper);
+  root.style.setProperty('--ink-2-inverse', isDark ? '#3A3128' : '#CFC4B0');
+  root.style.setProperty('--muted-inverse', isDark ? '#7A6E5E' : '#8A7E6E');
+  root.style.setProperty('--rule-inverse', isDark ? '#D8CFBE' : '#3A3128');
+
+  const pair = FONT_PAIRS[t.fontPair] || FONT_PAIRS.newsreader;
+  root.style.setProperty('--display', pair.display);
+  root.style.setProperty('--serif', pair.serif);
+
+  document.querySelectorAll('.folio').forEach(el => {
+    el.style.display = t.showFolio ? '' : 'none';
+  });
+}
+
+function TweakApp() {
+  const [t, setTweak] = useTweaks(TWEAK_DEFAULTS);
+  React.useEffect(() => { applyTweaks(t); }, [t]);
+
+  return (
+    <TweaksPanel title="Tweaks">
+      <TweakSection label="Palette" />
+      <TweakColor
+        label="Theme"
+        value={t.palette}
+        options={PALETTES}
+        onChange={(v) => setTweak('palette', v)}
+      />
+
+      <TweakSection label="Typography" />
+      <TweakRadio
+        label="Display face"
+        value={t.fontPair}
+        options={[
+          { value: 'newsreader', label: 'Newsreader' },
+          { value: 'playfair',   label: 'Playfair' },
+          { value: 'source',     label: 'Source' },
+        ]}
+        onChange={(v) => setTweak('fontPair', v)}
+      />
+
+      <TweakSection label="Chrome" />
+      <TweakToggle
+        label="Page folios"
+        value={t.showFolio}
+        onChange={(v) => setTweak('showFolio', v)}
+      />
+    </TweaksPanel>
+  );
+}
+
+// apply defaults on load so first paint matches
+applyTweaks(TWEAK_DEFAULTS);
+
+const root = ReactDOM.createRoot(document.getElementById('tweaks-root'));
+root.render(<TweakApp />);
+</script>
+
+</body>
+</html>
